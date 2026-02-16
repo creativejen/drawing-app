@@ -49,7 +49,7 @@ export default async function RootLayout({
       >
         {children}
 
-        <footer className="mt-32 py-10 text-center text-sm text-zinc-500 flex flex-col items-center gap-3">
+        <footer className="mt-5 py-10 text-center text-sm text-zinc-500 flex flex-col items-center gap-3">
   <Image
     src={pokemon.image}
     alt={pokemon.name}
