@@ -53,8 +53,8 @@ export default async function RootLayout({
   <Image
     src={pokemon.image}
     alt={pokemon.name}
-    width={72}
-    height={72}
+    width={120}
+    height={120}
     className="hover:scale-110 transition"
   />
 
