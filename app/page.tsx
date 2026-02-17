@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Permanent_Marker } from "next/font/google";
 import { Heart } from "lucide-react";
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 const permanent = Permanent_Marker({
   subsets: ["latin"],
@@ -24,47 +25,45 @@ const drawings = [
 
 export default function Home() {
 
-  const [likes, setLikes] = useState<number[]>(() => {
-    if (typeof window === "undefined") {
-      return new Array(drawings.length).fill(0);
-    }
-
-    const saved = localStorage.getItem("likes");
-    return saved
-      ? JSON.parse(saved)
-      : new Array(drawings.length).fill(0);
-  });
-
-  const [liked, setLiked] = useState<boolean[]>(() => {
-    if (typeof window === "undefined") {
-      return new Array(drawings.length).fill(false);
-    }
-
-    const saved = localStorage.getItem("liked");
-    return saved
-      ? JSON.parse(saved)
-      : new Array(drawings.length).fill(false);
-  });
+  const [likes, setLikes] = useState<number[]>(
+    new Array(drawings.length).fill(0)
+  );
 
   useEffect(() => {
-    localStorage.setItem("likes", JSON.stringify(likes));
-    localStorage.setItem("liked", JSON.stringify(liked));
-  }, [likes, liked]);
+  const fetchLikes = async () => {
+    const { data } = await supabase
+      .from("likes")
+      .select("*");
 
-  const toggleLike = (index: number) => {
-    const newLikes = [...likes];
-    const newLiked = [...liked];
+    if (data) {
+      const initialLikes = new Array(drawings.length).fill(0);
 
-    if (newLiked[index]) {
-      newLikes[index] -= 1;
-      newLiked[index] = false;
-    } else {
-      newLikes[index] += 1;
-      newLiked[index] = true;
+      data.forEach((item) => {
+        initialLikes[item.drawing_index] = item.count;
+      });
+
+      setLikes(initialLikes);
     }
+  };
 
+  fetchLikes();
+}, []);
+
+
+  const handleLike = async (index: number) => {
+    const current = likes[index] || 0;
+
+    // Optimistic update
+    const newLikes = [...likes];
+    newLikes[index] = current + 1;
     setLikes(newLikes);
-    setLiked(newLiked);
+
+    await supabase
+      .from("likes")
+      .upsert(
+        { drawing_index: index, count: current + 1 },
+        { onConflict: "drawing_index" }
+      );
   };
 
   return (
@@ -89,19 +88,11 @@ export default function Home() {
             />
 
             <button
-                onClick={() => toggleLike(index)}
+                onClick={() => handleLike(index)}
                 className="mt-4 flex items-center gap-2 group"
               >
                 <Heart
-                  className={`
-                    w-6 h-6 transition-all duration-300
-                    ${
-                      liked[index]
-                        ? "fill-[#c75b39] stroke-[#c75b39] scale-110"
-                        : "stroke-[#5c4a3b]"
-                    }
-                    group-hover:scale-110
-                  `}
+                  className="w-6 h-6 stroke-[#5c4a3b] hover:fill-[#c75b39] hover:stroke-[#c75b39] transition"
                 />
 
                 <span className="text-sm text-[#5c4a3b]">
