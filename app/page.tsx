@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Permanent_Marker } from "next/font/google";
 import { Heart } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const permanent = Permanent_Marker({
   subsets: ["latin"],
@@ -24,13 +24,32 @@ const drawings = [
 
 export default function Home() {
 
-  const [likes, setLikes] = useState<number[]>(
-  () => new Array(drawings.length).fill(0)
-  );
+  const [likes, setLikes] = useState<number[]>(() => {
+    if (typeof window === "undefined") {
+      return new Array(drawings.length).fill(0);
+    }
 
-  const [liked, setLiked] = useState<boolean[]>(
-    () => new Array(drawings.length).fill(false)
-  );
+    const saved = localStorage.getItem("likes");
+    return saved
+      ? JSON.parse(saved)
+      : new Array(drawings.length).fill(0);
+  });
+
+  const [liked, setLiked] = useState<boolean[]>(() => {
+    if (typeof window === "undefined") {
+      return new Array(drawings.length).fill(false);
+    }
+
+    const saved = localStorage.getItem("liked");
+    return saved
+      ? JSON.parse(saved)
+      : new Array(drawings.length).fill(false);
+  });
+
+  useEffect(() => {
+    localStorage.setItem("likes", JSON.stringify(likes));
+    localStorage.setItem("liked", JSON.stringify(liked));
+  }, [likes, liked]);
 
   const toggleLike = (index: number) => {
     const newLikes = [...likes];
