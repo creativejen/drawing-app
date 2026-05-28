@@ -21,6 +21,8 @@ const drawings = [
   "/drawings/GOUACHESTRAW.jpg",
   "/drawings/GOUACHEDOGS.jpg",
   "/drawings/GOUACHEBREDCAT.jpg",
+  "/drawings/GOUACHEBCATCOFFEE.jpg"
+
 ];
 
 export default function Home() {
