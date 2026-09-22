@@ -15,6 +15,7 @@ const permanent = Permanent_Marker({
 const drawings = [
   "/drawings/GOUCHEMAX.jpg",
   "/drawings/GOUACHEGIRLSNIGHT.jpg",
+  "/drawings/GOUACHEANGRYGIRL.jpg",
   "/drawings/GOUACHEMAISONROSE.jpg",
   "/drawings/GOUACHEHOMES.jpg",
   "/drawings/GOUACHEBCAT.jpg",
